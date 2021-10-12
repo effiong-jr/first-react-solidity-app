@@ -11,10 +11,12 @@ function App() {
     contract: null,
   })
 
-  // console.log(web3Api.contract.web3.eth.getBalance())
-
   const [balance, setBalance] = useState(null)
   const [account, setAccount] = useState(null)
+
+  const onAccountChange = (provider) => {
+    provider.on('accountsChanged', (accounts) => setAccount(accounts[0]))
+  }
 
   useEffect(() => {
     const loadProvider = async () => {
@@ -23,6 +25,7 @@ function App() {
       const contract = await loadContract('Faucet', provider)
 
       if (provider) {
+        onAccountChange(provider)
         setWeb3Api({
           web3: new Web3(provider),
           provider,
@@ -70,10 +73,23 @@ function App() {
         from: account,
         value: web3.utils.toWei('1', 'ether'),
       })
+
+      window.location.reload()
     } else {
       alert('Connect to a wallet')
     }
   }, [account, web3Api])
+
+  const withdrawFunds = async () => {
+    const { web3, contract } = web3Api
+    const withdrawAmount = web3.utils.toWei('0.1', 'ether')
+
+    await contract.withdraw(withdrawAmount, {
+      from: account,
+    })
+
+    window.location.reload()
+  }
 
   return (
     <>
@@ -101,7 +117,9 @@ function App() {
           <button className="button is-link mr-2" onClick={addFunds}>
             Donate 1 eth
           </button>
-          <button className="button is-primary  mr-2">Withdraw</button>
+          <button className="button is-primary  mr-2" onClick={withdrawFunds}>
+            Withdraw
+          </button>
         </div>
       </div>
     </>
