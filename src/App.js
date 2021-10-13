@@ -22,10 +22,11 @@ function App() {
     const loadProvider = async () => {
       const provider = await detectEthereumProvider()
 
-      const contract = await loadContract('Faucet', provider)
-
       if (provider) {
+        const contract = await loadContract('Faucet', provider)
+
         onAccountChange(provider)
+
         setWeb3Api({
           web3: new Web3(provider),
           provider,
@@ -84,11 +85,15 @@ function App() {
     const { web3, contract } = web3Api
     const withdrawAmount = web3.utils.toWei('0.1', 'ether')
 
-    await contract.withdraw(withdrawAmount, {
-      from: account,
-    })
+    if (account) {
+      await contract.withdraw(withdrawAmount, {
+        from: account,
+      })
 
-    window.location.reload()
+      window.location.reload()
+    } else {
+      alert('Please Connect to a wallet.')
+    }
   }
 
   return (
@@ -100,6 +105,11 @@ function App() {
             <span>
               {account ? (
                 account
+              ) : !web3Api.provider ? (
+                <span className="notification is-warning is-rounded">
+                  No ethereum wallet found. Please{' '}
+                  <a href="https://metamask.io/">Install Meta Mask!</a>
+                </span>
               ) : (
                 <button
                   className="button is-small"
@@ -114,10 +124,18 @@ function App() {
             Balance: <strong>{balance}</strong> ETH
           </div>
 
-          <button className="button is-link mr-2" onClick={addFunds}>
+          <button
+            className="button is-link mr-2"
+            disabled={!account && true}
+            onClick={addFunds}
+          >
             Donate 1 eth
           </button>
-          <button className="button is-primary  mr-2" onClick={withdrawFunds}>
+          <button
+            className="button is-primary  mr-2"
+            disabled={!account && true}
+            onClick={withdrawFunds}
+          >
             Withdraw
           </button>
         </div>
