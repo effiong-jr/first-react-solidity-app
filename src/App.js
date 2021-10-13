@@ -108,7 +108,13 @@ function App() {
               ) : !web3Api.provider ? (
                 <span className="notification is-warning is-rounded">
                   No ethereum wallet found. Please{' '}
-                  <a href="https://metamask.io/">Install Meta Mask!</a>
+                  <a
+                    href="https://metamask.io/"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Install Meta Mask!
+                  </a>
                 </span>
               ) : (
                 <button
